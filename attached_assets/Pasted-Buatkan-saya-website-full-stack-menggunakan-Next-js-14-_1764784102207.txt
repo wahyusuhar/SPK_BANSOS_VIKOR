@@ -1,0 +1,207 @@
+Buatkan saya website full-stack menggunakan Next.js 14 (App Router) dengan tujuan membangun:
+
+“Sistem Pakar Rekomendasi ______ (tema bebas, tentukan sendiri) Menggunakan Metode VIKOR”
+
+Struktur dan fitur yang saya butuhkan:
+
+🌐 TEKNOLOGI WAJIB
+
+Framework: Next.js 14 App Router (full-stack)
+
+Styling: TailwindCSS
+
+UI: shadcn/ui
+
+Database: Prisma + SQLite (local) dan PostgreSQL (prod)
+
+API: Route Handlers (app/api/.../route.ts)
+
+Deployment: 100% kompatibel untuk Vercel
+
+🎯 FITUR WEBSITE
+1. Halaman Utama
+
+Penjelasan tentang metode VIKOR
+
+Penjelasan tentang tema, misalnya:
+"Sistem pakar rekomendasi laptop terbaik menggunakan VIKOR"
+
+Tombol menuju:
+
+Kelola Kriteria
+
+Kelola Alternatif
+
+Perhitungan VIKOR
+
+Hasil Akhir Ranking
+
+2. CRUD Kriteria
+
+Setiap kriteria memiliki:
+
+id
+
+nama_kriteria
+
+bobot
+
+tipe (benefit / cost)
+
+deskripsi (opsional)
+
+CRUD dilakukan melalui:
+
+Halaman frontend
+
+API Next.js
+
+Prisma Model
+
+3. CRUD Alternatif
+
+Setiap alternatif memiliki:
+
+id
+
+nama
+
+deskripsi
+
+nilai per kriteria (disimpan dalam tabel terpisah misalnya nilai)
+
+4. Perhitungan Metode VIKOR
+
+Backend API harus melakukan:
+
+Normalisasi matriks keputusan
+
+Menentukan nilai Sᵢ
+
+Menentukan nilai Rᵢ
+
+Menghitung Qᵢ
+
+Melakukan ranking
+
+Menentukan alternatif terbaik
+
+Return dalam format JSON:
+
+{
+  s: [...],
+  r: [...],
+  q: [...],
+  ranking: [...]
+}
+
+5. Halaman Hasil
+
+Tabel hasil S, R, Q
+
+Tabel ranking alternatif
+
+Grafik (gunakan Chart.js)
+
+Highlight alternatif terbaik
+
+6. API ENDPOINT
+
+Buat API berikut:
+
+Kriteria
+
+GET /api/kriteria
+
+POST /api/kriteria
+
+PUT /api/kriteria/:id
+
+DELETE /api/kriteria/:id
+
+Alternatif
+
+GET /api/alternatif
+
+POST /api/alternatif
+
+PUT /api/alternatif/:id
+
+DELETE /api/alternatif/:id
+
+Perhitungan VIKOR
+
+POST /api/hitung-vikor
+
+📦 DATABASE (PRISMA SCHEMA)
+
+Buat schema berikut:
+
+Kriteria
+
+Alternatif
+
+Nilai (menampung nilai alternatif terhadap tiap kriteria)
+
+Contoh model:
+
+model Kriteria {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  bobot     Float
+  tipe      String   // benefit | cost
+  nilai     Nilai[]
+}
+
+model Alternatif {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  deskripsi String?
+  nilai     Nilai[]
+}
+
+model Nilai {
+  id            Int   @id @default(autoincrement())
+  alternatifId  Int
+  kriteriaId    Int
+  nilai         Float
+  Alternatif    Alternatif @relation(fields: [alternatifId], references: [id])
+  Kriteria      Kriteria   @relation(fields: [kriteriaId], references: [id])
+}
+
+🎨 DESAIN UI
+
+Gunakan TailwindCSS
+
+Semua tampilan gunakan komponen shadcn/ui
+
+Gunakan card, table, modal dialog
+
+Harus responsif di HP
+
+Tema clean modern
+
+⚙️ OUTPUT YANG HARUS DIHASILKAN
+
+AI harus memberikan:
+
+✔ 1. Struktur folder Next.js
+✔ 2. File lengkap:
+
+Halaman (page.tsx)
+
+Components
+
+Route API
+
+Prisma schema
+
+Kode perhitungan VIKOR
+
+Database query
+
+UI CRUD lengkap
+
+✔ 3. Perintah instalasi
+✔ 4. Perintah deploy ke Vercel
+✔ 5. Demo input-output perhitungan VIKOR
