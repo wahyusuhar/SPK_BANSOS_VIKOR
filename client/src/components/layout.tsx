@@ -6,7 +6,7 @@ import {
   Users, 
   Calculator, 
   Menu,
-  Laptop
+  HandHeart
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
@@ -14,8 +14,8 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/criteria", label: "Kriteria", icon: ListFilter },
-  { href: "/alternatives", label: "Alternatif", icon: Users },
+  { href: "/criteria", label: "Kriteria Penilaian", icon: ListFilter },
+  { href: "/alternatives", label: "Data Penerima", icon: Users },
   { href: "/calculation", label: "Perhitungan VIKOR", icon: Calculator },
 ];
 
@@ -27,11 +27,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     <div className="flex flex-col h-full">
       <div className="p-6 flex items-center gap-3">
         <div className="size-10 bg-primary rounded-lg flex items-center justify-center text-primary-foreground shadow-lg shadow-primary/20">
-          <Laptop className="size-6" />
+          <HandHeart className="size-6" />
         </div>
         <div>
-          <h1 className="font-bold text-lg tracking-tight">LaptopSys</h1>
-          <p className="text-xs text-muted-foreground font-medium">VIKOR Method</p>
+          <h1 className="font-bold text-lg tracking-tight">BansosSys</h1>
+          <p className="text-xs text-muted-foreground font-medium">Sistem Pakar VIKOR</p>
         </div>
       </div>
 
@@ -59,13 +59,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <div className="p-6 border-t border-border/50">
         <div className="bg-card border border-border p-4 rounded-xl">
-          <p className="text-xs text-muted-foreground mb-2">System Status</p>
+          <p className="text-xs text-muted-foreground mb-2">Status Server</p>
           <div className="flex items-center gap-2">
             <span className="relative flex h-2.5 w-2.5">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Active</span>
+            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Online - Vercel</span>
           </div>
         </div>
       </div>

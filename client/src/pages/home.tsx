@@ -2,7 +2,7 @@ import { useStore } from "@/lib/store";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { ArrowRight, Database, Calculator, Trophy, ListFilter } from "lucide-react";
+import { ArrowRight, Users, Calculator, Trophy, ListFilter, FileText } from "lucide-react";
 
 export default function Home() {
   const { criteria, alternatives } = useStore();
@@ -10,34 +10,39 @@ export default function Home() {
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Dashboard</h1>
-        <p className="text-muted-foreground text-lg">
-          Sistem Pendukung Keputusan Rekomendasi Laptop Terbaik Metode VIKOR
+        <div className="flex items-center gap-3 mb-2">
+          <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20">
+            Sistem Pakar
+          </span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">BANSOS Dashboard</h1>
+        <p className="text-muted-foreground text-lg max-w-2xl">
+          Sistem Penilaian Kelayakan Penerima Bantuan Sosial menggunakan metode VIKOR (VlseKriterijumska Optimizacija I Kompromisno Resenje).
         </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
         <Card className="glass-card hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Kriteria</CardTitle>
+            <CardTitle className="text-sm font-medium">Kriteria Penilaian</CardTitle>
             <ListFilter className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{criteria.length}</div>
             <p className="text-xs text-muted-foreground">
-              Parameter penilaian aktif
+              Parameter kelayakan aktif
             </p>
           </CardContent>
         </Card>
         <Card className="glass-card hover:shadow-md transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Alternatif</CardTitle>
-            <Database className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Calon Penerima</CardTitle>
+            <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{alternatives.length}</div>
             <p className="text-xs text-muted-foreground">
-              Laptop terdaftar dalam sistem
+              Warga terdaftar dalam sistem
             </p>
           </CardContent>
         </Card>
@@ -49,7 +54,7 @@ export default function Home() {
           <CardContent>
             <div className="text-2xl font-bold text-primary">Siap</div>
             <p className="text-xs text-primary/80">
-              Data cukup untuk perhitungan
+              Data siap untuk dikalkulasi
             </p>
           </CardContent>
         </Card>
@@ -60,21 +65,24 @@ export default function Home() {
           <CardHeader>
             <CardTitle>Tentang Metode VIKOR</CardTitle>
             <CardDescription>
-              VlseKriterijumska Optimizacija I Kompromisno Resenje
+              Metode pengambilan keputusan multikriteria
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Metode VIKOR adalah metode kompromi ranking multikriteria yang dikembangkan untuk menyelesaikan masalah keputusan dengan kriteria yang bertentangan dan non-commensurable. Metode ini berfokus pada meranking dan memilih dari sekumpulan alternatif dengan kriteria yang saling bertentangan.
+              Sistem ini menggunakan metode VIKOR untuk meranking calon penerima bantuan sosial. Metode ini berfokus pada perankingan dan pemilihan dari sekumpulan alternatif dengan kriteria yang saling bertentangan (misalnya: Penghasilan vs Tanggungan), untuk mencapai solusi kompromi yang paling mendekati ideal.
             </p>
             <div className="bg-secondary/50 p-4 rounded-lg border border-border space-y-2">
-              <h4 className="font-semibold text-sm">Langkah Perhitungan:</h4>
-              <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1">
-                <li>Normalisasi Matriks Keputusan</li>
-                <li>Menentukan Nilai Terbaik (f*) dan Terburuk (f-)</li>
-                <li>Menghitung Nilai S (Group Utility) dan R (Individual Regret)</li>
-                <li>Menghitung Nilai Indeks VIKOR (Q)</li>
-                <li>Perankingan Berdasarkan Nilai Q Terkecil</li>
+              <h4 className="font-semibold text-sm flex items-center gap-2">
+                <FileText className="size-4" />
+                Alur Proses:
+              </h4>
+              <ol className="list-decimal list-inside text-sm text-muted-foreground space-y-1 ml-1">
+                <li>Input Data Warga (Calon Penerima)</li>
+                <li>Tentukan Kriteria & Bobot (Misal: Penghasilan, Kondisi Rumah)</li>
+                <li>Input Nilai setiap warga terhadap kriteria</li>
+                <li>Sistem menghitung Nilai Utilitas (S), Penyesalan (R), dan Indeks VIKOR (Q)</li>
+                <li>Ranking teratas adalah yang paling layak menerima bantuan</li>
               </ol>
             </div>
           </CardContent>
@@ -82,25 +90,25 @@ export default function Home() {
 
         <Card className="col-span-3 glass-card flex flex-col">
           <CardHeader>
-            <CardTitle>Aksi Cepat</CardTitle>
-            <CardDescription>Kelola data dan mulai perhitungan</CardDescription>
+            <CardTitle>Menu Utama</CardTitle>
+            <CardDescription>Akses cepat manajemen data</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-center gap-3">
             <Link href="/criteria">
               <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-colors">
-                <span className="flex items-center gap-2"><ListFilter className="size-4" /> Kelola Kriteria</span>
+                <span className="flex items-center gap-2"><ListFilter className="size-4" /> Atur Kriteria</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>
             <Link href="/alternatives">
               <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-colors">
-                <span className="flex items-center gap-2"><Database className="size-4" /> Kelola Alternatif</span>
+                <span className="flex items-center gap-2"><Users className="size-4" /> Data Penerima</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>
             <Link href="/calculation">
               <Button className="w-full justify-between h-12 shadow-lg shadow-primary/25">
-                <span className="flex items-center gap-2"><Calculator className="size-4" /> Mulai Perhitungan</span>
+                <span className="flex items-center gap-2"><Calculator className="size-4" /> Hitung Kelayakan</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>

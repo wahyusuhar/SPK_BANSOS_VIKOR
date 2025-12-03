@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Play, Trophy, BarChart3, Table as TableIcon } from "lucide-react";
+import { Play, Trophy, BarChart3, Table as TableIcon, Download, CheckCircle2, AlertCircle } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -48,54 +48,59 @@ export default function CalculationPage() {
     <div className="space-y-8">
       <div className="flex items-end justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Perhitungan VIKOR</h1>
-          <p className="text-muted-foreground">Jalankan algoritma VIKOR untuk mendapatkan rekomendasi</p>
+          <h1 className="text-3xl font-bold tracking-tight">Hasil Perhitungan VIKOR</h1>
+          <p className="text-muted-foreground">Analisis peringkat kelayakan penerima bantuan sosial</p>
         </div>
-        <Button 
-          size="lg" 
-          onClick={handleCalculate} 
-          className="shadow-lg shadow-primary/25 animate-in zoom-in duration-300"
-        >
-          <Play className="mr-2 h-5 w-5 fill-current" /> Hitung Sekarang
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            size="lg" 
+            onClick={handleCalculate} 
+            className="shadow-lg shadow-primary/25 animate-in zoom-in duration-300"
+          >
+            <Play className="mr-2 h-5 w-5 fill-current" /> Hitung Kelayakan
+          </Button>
+        </div>
       </div>
 
       {!result && (
         <div className="flex flex-col items-center justify-center h-[400px] border-2 border-dashed rounded-xl bg-secondary/20 text-muted-foreground">
           <BarChart3 className="size-16 mb-4 opacity-20" />
           <p className="text-lg font-medium">Belum ada hasil perhitungan</p>
-          <p className="text-sm">Klik tombol "Hitung Sekarang" untuk memproses data.</p>
+          <p className="text-sm">Pastikan data warga sudah terisi, lalu klik tombol "Hitung Kelayakan".</p>
         </div>
       )}
 
       {result && (
         <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Top Winner Card */}
-          <Card className="bg-gradient-to-br from-primary/10 via-primary/5 to-background border-primary/20 overflow-hidden relative">
+          <Card className="bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-background border-emerald-500/20 overflow-hidden relative">
             <div className="absolute top-0 right-0 p-8 opacity-10">
-              <Trophy className="size-64 text-primary" />
+              <Trophy className="size-64 text-emerald-600" />
             </div>
             <CardHeader>
-              <CardTitle className="text-primary flex items-center gap-2">
-                <Trophy className="size-5" /> Rekomendasi Terbaik
+              <CardTitle className="text-emerald-600 flex items-center gap-2">
+                <CheckCircle2 className="size-5" /> Paling Layak Menerima Bantuan
               </CardTitle>
-              <CardDescription>Berdasarkan nilai indeks VIKOR (Q) terendah</CardDescription>
+              <CardDescription>Berdasarkan nilai indeks VIKOR (Q) terendah (Kompromi Terbaik)</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="text-4xl font-bold mb-2">
+              <div className="text-4xl font-bold mb-2 text-foreground">
                 {alternatives.find(a => a.id === result.ranking[0].alternativeId)?.name}
               </div>
-              <div className="flex gap-6 mt-4">
+              <p className="text-muted-foreground mb-6">
+                {alternatives.find(a => a.id === result.ranking[0].alternativeId)?.address}
+              </p>
+              <div className="flex gap-8 mt-4 bg-card/50 p-4 rounded-lg border border-border/50 w-fit backdrop-blur-sm">
                 <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai Q</div>
-                  <div className="text-xl font-mono font-medium">{result.ranking[0].qValue.toFixed(4)}</div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai Q (Index)</div>
+                  <div className="text-xl font-mono font-bold text-emerald-600">{result.ranking[0].qValue.toFixed(4)}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai S</div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai S (Utility)</div>
                   <div className="text-xl font-mono text-muted-foreground">{result.ranking[0].sValue.toFixed(4)}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai R</div>
+                  <div className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">Nilai R (Regret)</div>
                   <div className="text-xl font-mono text-muted-foreground">{result.ranking[0].rValue.toFixed(4)}</div>
                 </div>
               </div>
@@ -104,34 +109,51 @@ export default function CalculationPage() {
 
           <Tabs defaultValue="ranking" className="w-full">
             <TabsList className="grid w-full max-w-md grid-cols-2">
-              <TabsTrigger value="ranking">Hasil Ranking</TabsTrigger>
-              <TabsTrigger value="details">Detail Perhitungan</TabsTrigger>
+              <TabsTrigger value="ranking">Ranking & Visualisasi</TabsTrigger>
+              <TabsTrigger value="details">Matriks & Data Teknis</TabsTrigger>
             </TabsList>
             
             <TabsContent value="ranking" className="space-y-6 mt-6">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 <Card className="glass-card">
-                  <CardHeader>
-                    <CardTitle>Tabel Peringkat</CardTitle>
-                    <CardDescription>Urutan prioritas rekomendasi (Q terkecil adalah terbaik)</CardDescription>
+                  <CardHeader className="flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle>Tabel Prioritas</CardTitle>
+                      <CardDescription>Urutan warga prioritas penerima bantuan</CardDescription>
+                    </div>
+                    <Button variant="outline" size="sm">
+                      <Download className="size-4 mr-2" /> PDF
+                    </Button>
                   </CardHeader>
                   <CardContent className="p-0">
                     <Table>
                       <TableHeader>
                         <TableRow>
                           <TableHead className="w-[60px] text-center">Rank</TableHead>
-                          <TableHead>Alternatif</TableHead>
-                          <TableHead className="text-right">Nilai Q</TableHead>
+                          <TableHead>Nama Warga</TableHead>
+                          <TableHead className="text-right">Skor Q</TableHead>
+                          <TableHead className="text-right">Status</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {result.ranking.map((item) => (
-                          <TableRow key={item.alternativeId} className={item.rank === 1 ? "bg-primary/5" : ""}>
-                            <TableCell className="text-center font-bold">#{item.rank}</TableCell>
+                        {result.ranking.map((item, index) => (
+                          <TableRow key={item.alternativeId} className={item.rank === 1 ? "bg-emerald-500/5" : ""}>
+                            <TableCell className="text-center font-bold text-lg">#{item.rank}</TableCell>
                             <TableCell className="font-medium">
                               {alternatives.find(a => a.id === item.alternativeId)?.name}
                             </TableCell>
                             <TableCell className="text-right font-mono">{item.qValue.toFixed(4)}</TableCell>
+                            <TableCell className="text-right">
+                                {index < 3 ? (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+                                    Prioritas Utama
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary text-secondary-foreground">
+                                    Cadangan
+                                  </span>
+                                )}
+                            </TableCell>
                           </TableRow>
                         ))}
                       </TableBody>
@@ -141,12 +163,12 @@ export default function CalculationPage() {
 
                 <Card className="glass-card">
                   <CardHeader>
-                    <CardTitle>Visualisasi Skor Q</CardTitle>
-                    <CardDescription>Perbandingan nilai indeks VIKOR antar alternatif</CardDescription>
+                    <CardTitle>Grafik Indeks VIKOR</CardTitle>
+                    <CardDescription>Semakin rendah bar, semakin layak menerima bantuan</CardDescription>
                   </CardHeader>
                   <CardContent className="h-[300px]">
                     <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={chartData} layout="vertical" margin={{ left: 20 }}>
+                      <BarChart data={chartData} layout="vertical" margin={{ left: 20, right: 20 }}>
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
                         <XAxis type="number" stroke="hsl(var(--muted-foreground))" fontSize={12} />
                         <YAxis dataKey="name" type="category" width={100} stroke="hsl(var(--muted-foreground))" fontSize={12} />
@@ -170,14 +192,14 @@ export default function CalculationPage() {
             <TabsContent value="details" className="space-y-6 mt-6">
               <Card className="glass-card">
                 <CardHeader>
-                  <CardTitle>Matriks Hasil Perhitungan</CardTitle>
-                  <CardDescription>Nilai S (Utility) dan R (Regret) untuk setiap alternatif</CardDescription>
+                  <CardTitle>Matriks Nilai S, R, Q</CardTitle>
+                  <CardDescription>Detail perhitungan matematis untuk validasi</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Alternatif</TableHead>
+                        <TableHead>Nama Warga</TableHead>
                         <TableHead className="text-right">S (Group Utility)</TableHead>
                         <TableHead className="text-right">R (Individual Regret)</TableHead>
                         <TableHead className="text-right">Q (VIKOR Index)</TableHead>
@@ -202,8 +224,8 @@ export default function CalculationPage() {
 
               <Card className="glass-card">
                 <CardHeader>
-                  <CardTitle>Nilai Terbaik (f*) dan Terburuk (f-)</CardTitle>
-                  <CardDescription>Referensi perhitungan normalisasi</CardDescription>
+                  <CardTitle>Nilai Referensi (f* dan f-)</CardTitle>
+                  <CardDescription>Titik acuan normalisasi matriks</CardDescription>
                 </CardHeader>
                 <CardContent>
                    <Table>

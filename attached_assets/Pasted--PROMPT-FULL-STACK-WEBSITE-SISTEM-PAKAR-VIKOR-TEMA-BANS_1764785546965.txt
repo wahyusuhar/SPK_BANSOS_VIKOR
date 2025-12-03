@@ -1,0 +1,272 @@
+🚀 PROMPT FULL-STACK WEBSITE SISTEM PAKAR VIKOR – TEMA BANSOS (READY VERSEL + VSCode)
+
+PROMPT (Copy all text below)
+👇👇👇
+
+Buatkan saya sebuah website full-stack lengkap menggunakan Next.js 14 App Router dengan tema:
+
+“Sistem Pakar Penilaian Kelayakan Penerima Bantuan Sosial (BANSOS) Menggunakan Metode VIKOR”
+
+Saya ingin hasil akhirnya berupa 1 folder project lengkap, bisa saya download, jalankan di VSCode, dan langsung deploy ke Vercel.
+
+🎯 TEKNOLOGI WAJIB
+
+Gunakan teknologi berikut:
+
+Frontend & Backend: Next.js 14 dengan App Router
+
+Styling: TailwindCSS
+
+UI: shadcn/ui
+
+Database: Prisma + SQLite (dev) + PostgreSQL (production/Vercel)
+
+Chart: Chart.js
+
+Tipe Bahasa: TypeScript
+
+Perhitungan VIKOR: custom function di folder lib/vikor.ts
+
+Project harus 100% kompatibel dengan Vercel Deployment.
+
+🧩 FITUR SISTEM
+1. Halaman Utama
+
+Berisi:
+
+Penjelasan singkat BANSOS
+
+Penjelasan metode VIKOR
+
+Tombol navigasi ke:
+
+Kelola Kriteria
+
+Kelola Alternatif (Calon Penerima Bansos)
+
+Input Nilai
+
+Hitung VIKOR
+
+Hasil Akhir
+
+Tema Bansos contoh kriteria:
+
+Penghasilan keluarga (cost)
+
+Jumlah tanggungan (benefit)
+
+Kondisi rumah (benefit)
+
+Status pekerjaan (cost)
+
+Pendidikan terakhir (benefit)
+
+Namun buat sistem CRUD, jadi user bisa menambah kriteria sendiri.
+
+2. CRUD Kriteria
+
+Kriteria memiliki:
+
+id
+
+nama_kriteria
+
+bobot
+
+tipe (benefit/cost)
+
+deskripsi
+
+Harus dapat:
+
+tambah
+
+edit
+
+hapus
+
+tampilkan daftar
+
+3. CRUD Alternatif (Calon Penerima Bansos)
+
+Alternatif memiliki:
+
+id
+
+nama warga
+
+alamat
+
+deskripsi keluarga
+
+Buat form CRUD lengkap.
+
+4. Input Nilai Alternatif per Kriteria
+
+User dapat memberikan nilai untuk setiap alternatif terhadap setiap kriteria.
+
+Simpan ke database tabel Nilai.
+
+5. Perhitungan VIKOR
+
+Buatkan file di lib/vikor.ts berisi seluruh fungsi:
+
+Normalisasi matriks
+
+Bobot
+
+Hitung S
+
+Hitung R
+
+Hitung Q
+
+Ranking otomatis
+
+Return JSON lengkap:
+
+{
+  "normalisasi": [...],
+  "s": [...],
+  "r": [...],
+  "q": [...],
+  "ranking": [...]
+}
+
+6. Halaman Hasil VIKOR
+
+Tampilkan:
+
+Tabel nilai S, R, Q
+
+Ranking alternatif
+
+Alternatif terbaik
+
+Grafik ranking (Chart.js)
+
+Tombol Download Hasil (PDF)
+
+7. API Route Next.js
+
+Buat API pada:
+
+app/api/kriteria → GET, POST
+
+app/api/kriteria/[id] → PUT, DELETE
+
+app/api/alternatif → GET, POST
+
+app/api/alternatif/[id] → PUT, DELETE
+
+app/api/nilai → GET, POST
+
+app/api/hitung-vikor → POST (mengembalikan hasil perhitungan)
+
+Gunakan Prisma untuk CRUD.
+
+🗃 DATABASE PRISMA SCHEMA
+
+Buat di prisma/schema.prisma:
+
+model Kriteria {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  bobot     Float
+  tipe      String   // benefit | cost
+  nilai     Nilai[]
+}
+
+model Alternatif {
+  id        Int      @id @default(autoincrement())
+  nama      String
+  alamat    String?
+  deskripsi String?
+  nilai     Nilai[]
+}
+
+model Nilai {
+  id            Int   @id @default(autoincrement())
+  alternatifId  Int
+  kriteriaId    Int
+  nilai         Float
+  Alternatif    Alternatif @relation(fields: [alternatifId], references: [id])
+  Kriteria      Kriteria   @relation(fields: [kriteriaId], references: [id])
+}
+
+🎨 UI/UX REQUIREMENTS
+
+Gunakan komponen shadcn/ui
+
+Button
+
+Card
+
+Input
+
+Table
+
+Dialog
+
+Desain modern, bersih, responsif
+
+Gunakan TailwindCSS sepenuhnya
+
+📦 OUTPUT YANG HARUS DIHASILKAN
+
+AI harus mengirimkan hasil berikut:
+
+✔ 1. Satu folder project lengkap (Next.js 14)
+
+semua file, halaman, komponen, API, Prisma, lib VIKOR
+
+✔ 2. Zip download link / file siap diunduh
+✔ 3. Instruksi lengkap menjalankan di VSCode
+
+Termasuk:
+
+npm install
+npx prisma migrate dev
+npm run dev
+
+✔ 4. Instruksi Deploy ke Vercel
+
+Termasuk:
+
+vercel deploy
+
+
+dan set environment variable:
+
+DATABASE_URL
+
+✔ 5. Contoh data kriteria + alternatif
+
+Buatkan minimal 3 contoh calon penerima bansos.
+
+📢 FORMAT WAJIB OUTPUT
+
+Semua kode dalam blok kode
+
+Jangan ada yang disingkat
+
+Berikan file lengkap, bukan potongan
+
+Project harus bisa langsung dijalankan
+
+🎯 Tujuan Utama
+
+Saya ingin website ini:
+
+Full-stack
+
+Bisa digunakan langsung
+
+Bisa di-deploy di Vercel
+
+Bisa saya run di VSCode setelah mendownload folder ZIP
+
+🎉 Akhiri Prompt Dengan:
+
+"Silakan buat seluruh file proyek lengkap beserta struktur folder, semua kode, instruksi instalasi, dan file zip untuk di-download."
