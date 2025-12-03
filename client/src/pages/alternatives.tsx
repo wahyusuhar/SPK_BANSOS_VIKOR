@@ -271,7 +271,7 @@ export default function AlternativesPage() {
                          step="any"
                          placeholder={`Masukkan nilai...`}
                          className="h-9"
-                         {...form.register(`crit_${c.id}`, { valueAsNumber: true })}
+                         {...form.register(`crit_${c.id}` as any, { valueAsNumber: true })}
                        />
                        {c.description && <p className="text-[10px] text-muted-foreground">{c.description}</p>}
                     </div>
