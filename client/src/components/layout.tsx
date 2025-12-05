@@ -1,14 +1,15 @@
 import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
-import { 
-  LayoutDashboard, 
-  ListFilter, 
-  Users, 
-  Calculator, 
+import {
+  LayoutDashboard,
+  ListFilter,
+  Users,
+  Calculator,
   Menu,
-  HandHeart
+  HandHeart,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
@@ -22,6 +23,23 @@ const NAV_ITEMS = [
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+
+  const applyTheme = (next: "light" | "dark") => {
+    setTheme(next);
+    const isDark = next === "dark";
+    document.documentElement.classList.toggle("dark", isDark);
+    localStorage.setItem("theme", next);
+  };
+
+  // init theme from localStorage
+  if (typeof window !== "undefined" && typeof document !== "undefined") {
+    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
+    const next = saved ?? "light";
+    if (next !== theme) {
+      applyTheme(next);
+    }
+  }
 
   const NavContent = () => (
     <div className="flex flex-col h-full">
@@ -31,7 +49,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </div>
         <div>
           <h1 className="font-bold text-lg tracking-tight">BansosSys</h1>
-          <p className="text-xs text-muted-foreground font-medium">Sistem Pakar VIKOR</p>
+          <p className="text-xs text-muted-foreground font-medium">
+            Sistem Pakar VIKOR
+          </p>
         </div>
       </div>
 
@@ -40,16 +60,23 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           const isActive = location === item.href;
           return (
             <Link key={item.href} href={item.href}>
-              <a 
+              <a
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200",
-                  isActive 
-                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25" 
+                  isActive
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
                     : "text-muted-foreground hover:bg-secondary hover:text-foreground"
                 )}
                 onClick={() => setIsMobileOpen(false)}
               >
-                <item.icon className={cn("size-5", isActive ? "text-primary-foreground" : "text-muted-foreground")} />
+                <item.icon
+                  className={cn(
+                    "size-5",
+                    isActive
+                      ? "text-primary-foreground"
+                      : "text-muted-foreground"
+                  )}
+                />
                 {item.label}
               </a>
             </Link>
@@ -65,7 +92,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Online</span>
+            <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">
+              Online
+            </span>
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-xs text-muted-foreground">Tema</span>
+            <Button
+              variant="outline"
+              size="icon"
+              className="shadow-sm"
+              onClick={() => applyTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? (
+                <Sun className="size-4" />
+              ) : (
+                <Moon className="size-4" />
+              )}
+            </Button>
           </div>
         </div>
       </div>

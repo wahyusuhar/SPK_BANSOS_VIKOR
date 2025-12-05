@@ -1,7 +1,9 @@
 import { Criterion, Alternative } from './store';
 
 export interface VikorResult {
-  matrix: number[][]; // Normalized matrix
+  matrix: number[][];
+  normalized: number[][];
+  weighted: number[][];
   bestValues: number[]; // f*
   worstValues: number[]; // f-
   s: number[]; // S values
@@ -41,9 +43,11 @@ export function calculateVikor(criteria: Criterion[], alternatives: Alternative[
     }
   });
 
-  // 3. Calculate S and R
+  // 3. Calculate normalized distances, weighted distances, S and R
   const s: number[] = new Array(n).fill(0);
   const r: number[] = new Array(n).fill(0);
+  const normalized: number[][] = Array.from({ length: n }, () => new Array(m).fill(0));
+  const weighted: number[][] = Array.from({ length: n }, () => new Array(m).fill(0));
 
   for (let i = 0; i < n; i++) {
     let sumS = 0;
@@ -70,8 +74,9 @@ export function calculateVikor(criteria: Criterion[], alternatives: Alternative[
       } else {
          distance = (val - best) / denominator;
       }
-
+      normalized[i][j] = distance;
       const weightedDistance = weight * distance;
+      weighted[i][j] = weightedDistance;
       
       sumS += weightedDistance;
       if (weightedDistance > maxR) {
@@ -112,6 +117,8 @@ export function calculateVikor(criteria: Criterion[], alternatives: Alternative[
 
   return {
     matrix: rawMatrix,
+    normalized,
+    weighted,
     bestValues: fBest,
     worstValues: fWorst,
     s,

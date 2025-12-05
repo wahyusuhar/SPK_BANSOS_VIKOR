@@ -18,6 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Play, Trophy, BarChart3, Download, CheckCircle2 } from "lucide-react";
 import {
   BarChart,
@@ -67,7 +68,8 @@ export default function CalculationPage() {
       <div className="flex flex-col sm:flex-row items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight mt-2 sm:mt-5">
-            Hasil Perhitungan <br />VIKOR
+            Hasil Perhitungan <br />
+            VIKOR
           </h1>
           <p className="text-muted-foreground">
             Analisis peringkat kelayakan penerima bantuan sosial
@@ -294,6 +296,55 @@ export default function CalculationPage() {
             </TabsContent>
 
             <TabsContent value="details" className="space-y-6 mt-6">
+              {/* Matriks Normalisasi */}
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle>Matriks Normalisasi</CardTitle>
+                  <CardDescription>
+                    Nilai jarak ternormalisasi per kriteria untuk tiap warga
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ScrollArea className="w-full">
+                    <Table className="min-w-[720px] table-auto">
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Nama Warga</TableHead>
+                          {criteria.map((c) => (
+                            <TableHead
+                              key={c.id}
+                              className="text-right whitespace-nowrap"
+                            >
+                              {c.name}
+                            </TableHead>
+                          ))}
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {result?.normalized.map((row, i) => {
+                          const alt = alternatives[i];
+                          return (
+                            <TableRow key={alt.id}>
+                              <TableCell className="font-medium">
+                                {alt.name}
+                              </TableCell>
+                              {row.map((val, j) => (
+                                <TableCell
+                                  key={`${alt.id}-${j}`}
+                                  className="text-right font-mono text-muted-foreground"
+                                >
+                                  {val.toFixed(4)}
+                                </TableCell>
+                              ))}
+                            </TableRow>
+                          );
+                        })}
+                      </TableBody>
+                    </Table>
+                    <ScrollBar orientation="horizontal" />
+                  </ScrollArea>
+                </CardContent>
+              </Card>
               {/* Matriks Nilai S,R,Q */}
               <Card className="glass-card">
                 <CardHeader>

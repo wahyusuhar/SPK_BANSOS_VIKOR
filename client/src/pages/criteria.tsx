@@ -36,7 +36,23 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Plus, Trash2, Edit, ArrowUpDown } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 
 const criterionSchema = z.object({
@@ -49,9 +65,12 @@ const criterionSchema = z.object({
 type CriterionFormValues = z.infer<typeof criterionSchema>;
 
 export default function CriteriaPage() {
-  const { criteria, addCriterion, updateCriterion, deleteCriterion } = useStore();
+  const { criteria, addCriterion, updateCriterion, deleteCriterion } =
+    useStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Criterion | null>(null);
   const { toast } = useToast();
 
   const form = useForm<CriterionFormValues>({
@@ -70,7 +89,10 @@ export default function CriteriaPage() {
       toast({ title: "Berhasil", description: "Kriteria berhasil diperbarui" });
     } else {
       addCriterion(data);
-      toast({ title: "Berhasil", description: "Kriteria berhasil ditambahkan" });
+      toast({
+        title: "Berhasil",
+        description: "Kriteria berhasil ditambahkan",
+      });
     }
     setIsDialogOpen(false);
     setEditingId(null);
@@ -88,11 +110,21 @@ export default function CriteriaPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("Apakah Anda yakin ingin menghapus kriteria ini?")) {
-      deleteCriterion(id);
-      toast({ title: "Dihapus", description: "Kriteria berhasil dihapus", variant: "destructive" });
-    }
+  const openDeleteConfirm = (item: Criterion) => {
+    setDeleteTarget(item);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteCriterion(deleteTarget.id);
+    toast({
+      title: "Dihapus",
+      description: `Kriteria "${deleteTarget.name}" berhasil dihapus`,
+      variant: "destructive",
+    });
+    setConfirmOpen(false);
+    setDeleteTarget(null);
   };
 
   const handleAddNew = () => {
@@ -111,9 +143,14 @@ export default function CriteriaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Data Kriteria</h1>
-          <p className="text-muted-foreground">Kelola kriteria penilaian dan bobot</p>
+          <p className="text-muted-foreground">
+            Kelola kriteria penilaian dan bobot
+          </p>
         </div>
-        <Button onClick={handleAddNew} className="bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 mt-20">
+        <Button
+          onClick={handleAddNew}
+          className="bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 mt-20"
+        >
           <Plus className="mr-2 h-4 w-4" /> Tambah Kriteria
         </Button>
       </div>
@@ -122,7 +159,8 @@ export default function CriteriaPage() {
         <CardHeader>
           <CardTitle>Daftar Kriteria</CardTitle>
           <CardDescription>
-            Pastikan total bobot disarankan mendekati 1.0 (Saat ini: {criteria.reduce((a, b) => a + b.weight, 0).toFixed(2)})
+            Pastikan total bobot disarankan mendekati 1.0 (Saat ini:{" "}
+            {criteria.reduce((a, b) => a + b.weight, 0).toFixed(2)})
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -140,26 +178,45 @@ export default function CriteriaPage() {
             <TableBody>
               {criteria.map((item) => (
                 <TableRow key={item.id} className="group">
-                  <TableCell className="font-mono text-xs text-muted-foreground">#{item.id}</TableCell>
+                  <TableCell className="font-mono text-xs text-muted-foreground">
+                    #{item.id}
+                  </TableCell>
                   <TableCell className="font-medium">{item.name}</TableCell>
                   <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      item.type === 'benefit' 
-                        ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400' 
-                        : 'bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400'
-                    }`}>
-                      {item.type === 'benefit' ? <ArrowUpDown className="w-3 h-3 mr-1 rotate-180" /> : <ArrowUpDown className="w-3 h-3 mr-1" />}
+                    <span
+                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        item.type === "benefit"
+                          ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                          : "bg-rose-100 text-rose-800 dark:bg-rose-900/30 dark:text-rose-400"
+                      }`}
+                    >
+                      {item.type === "benefit" ? (
+                        <ArrowUpDown className="w-3 h-3 mr-1 rotate-180" />
+                      ) : (
+                        <ArrowUpDown className="w-3 h-3 mr-1" />
+                      )}
                       {item.type.toUpperCase()}
                     </span>
                   </TableCell>
                   <TableCell className="font-mono">{item.weight}</TableCell>
-                  <TableCell className="text-muted-foreground text-sm">{item.description}</TableCell>
+                  <TableCell className="text-muted-foreground text-sm">
+                    {item.description}
+                  </TableCell>
                   <TableCell className="text-right">
-                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="icon" onClick={() => handleEdit(item)}>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleEdit(item)}
+                      >
                         <Edit className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)} className="text-destructive hover:text-destructive">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openDeleteConfirm(item)}
+                        className="text-destructive hover:text-destructive"
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -168,7 +225,10 @@ export default function CriteriaPage() {
               ))}
               {criteria.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-8 text-muted-foreground">
+                  <TableCell
+                    colSpan={6}
+                    className="text-center py-8 text-muted-foreground"
+                  >
                     Belum ada data kriteria.
                   </TableCell>
                 </TableRow>
@@ -181,7 +241,9 @@ export default function CriteriaPage() {
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{editingId ? "Edit Kriteria" : "Tambah Kriteria Baru"}</DialogTitle>
+            <DialogTitle>
+              {editingId ? "Edit Kriteria" : "Tambah Kriteria Baru"}
+            </DialogTitle>
           </DialogHeader>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -192,7 +254,7 @@ export default function CriteriaPage() {
                   <FormItem>
                     <FormLabel>Nama Kriteria</FormLabel>
                     <FormControl>
-                      <Input placeholder="Contoh: Harga, RAM..." {...field} />
+                      <Input placeholder="Contoh: Jumlah Tanggungan" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -206,7 +268,12 @@ export default function CriteriaPage() {
                     <FormItem>
                       <FormLabel>Bobot (0-1)</FormLabel>
                       <FormControl>
-                        <Input type="number" step="0.01" placeholder="0.1" {...field} />
+                        <Input
+                          type="number"
+                          step="0.01"
+                          placeholder="0.1"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -218,15 +285,22 @@ export default function CriteriaPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Tipe Atribut</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Pilih tipe" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="benefit">Benefit (Makin besar makin baik)</SelectItem>
-                          <SelectItem value="cost">Cost (Makin kecil makin baik)</SelectItem>
+                          <SelectItem value="benefit">
+                            Benefit (Makin besar makin baik)
+                          </SelectItem>
+                          <SelectItem value="cost">
+                            Cost (Makin kecil makin baik)
+                          </SelectItem>
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -248,12 +322,41 @@ export default function CriteriaPage() {
                 )}
               />
               <div className="flex justify-end pt-4">
-                <Button type="submit">{editingId ? "Simpan Perubahan" : "Tambah Data"}</Button>
+                <Button type="submit">
+                  {editingId ? "Simpan Perubahan" : "Tambah Data"}
+                </Button>
               </div>
             </form>
           </Form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center size-8 rounded-full bg-red-100 text-red-600">
+                <Trash2 className="size-4" />
+              </span>
+              Hapus Kriteria?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini akan menghapus kriteria
+              {deleteTarget ? ` "${deleteTarget.name}"` : ""}. Proses ini tidak
+              dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batalkan</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

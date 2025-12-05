@@ -19,6 +19,16 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import {
   Form,
   FormControl,
   FormField,
@@ -56,6 +66,8 @@ export default function AlternativesPage() {
   } = useStore();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<Alternative | null>(null);
   const { toast } = useToast();
 
   const form = useForm({
@@ -114,15 +126,21 @@ export default function AlternativesPage() {
     setIsDialogOpen(true);
   };
 
-  const handleDelete = (id: number) => {
-    if (confirm("Hapus data warga ini beserta nilai penilaiannya?")) {
-      deleteAlternative(id);
-      toast({
-        title: "Dihapus",
-        description: "Data berhasil dihapus",
-        variant: "destructive",
-      });
-    }
+  const openDeleteConfirm = (item: Alternative) => {
+    setDeleteTarget(item);
+    setConfirmOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (!deleteTarget) return;
+    deleteAlternative(deleteTarget.id);
+    toast({
+      title: "Dihapus",
+      description: `Data ${deleteTarget.name} berhasil dihapus`,
+      variant: "destructive",
+    });
+    setConfirmOpen(false);
+    setDeleteTarget(null);
   };
 
   const handleAddNew = () => {
@@ -229,7 +247,7 @@ export default function AlternativesPage() {
                         </TableCell>
                       ))}
                       <TableCell className="text-right pr-6 align-middle">
-                        <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
@@ -240,7 +258,7 @@ export default function AlternativesPage() {
                           <Button
                             variant="ghost"
                             size="icon"
-                            onClick={() => handleDelete(item.id)}
+                            onClick={() => openDeleteConfirm(item)}
                             className="text-destructive hover:text-destructive"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -388,6 +406,33 @@ export default function AlternativesPage() {
           </Form>
         </DialogContent>
       </Dialog>
+
+      <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center size-8 rounded-full bg-red-100 text-red-600">
+                <Trash2 className="size-4" />
+              </span>
+              Hapus Data Warga?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Tindakan ini akan menghapus data
+              {deleteTarget ? ` "${deleteTarget.name}"` : ""} beserta nilai
+              penilaiannya. Proses ini tidak dapat dibatalkan.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Batalkan</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Hapus
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

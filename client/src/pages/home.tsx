@@ -9,50 +9,70 @@ export default function Home() {
 
   return (
     <div className="space-y-8">
-      <div className="space-y-2">
-        <div className="flex items-center gap-3 mb-2">
-          <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20">
-            Sistem Pakar
-          </span>
+      <div className="relative overflow-hidden rounded-2xl border bg-gradient-to-br from-primary/10 via-primary/5 to-background">
+        <div className="absolute -top-24 -right-24 size-[280px] rounded-full bg-primary/20 blur-3xl" />
+        <div className="p-6 md:p-8">
+          <div className="flex items-center gap-3 mb-3 animate-in fade-in slide-in-from-top-2">
+            <span className="px-3 py-1 rounded-full bg-primary/15 text-primary text-xs font-bold uppercase tracking-wider border border-primary/20 shadow-sm">
+              Sistem Pakar
+            </span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-2">BANSOS Dashboard</h1>
+          <p className="text-muted-foreground text-lg max-w-2xl mt-2 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            Sistem Penilaian Kelayakan Penerima Bantuan Sosial menggunakan metode VIKOR (VlseKriterijumska Optimizacija I Kompromisno Resenje).
+          </p>
+          <div className="mt-4 flex flex-wrap gap-3">
+            <Link href="/criteria">
+              <Button variant="outline" className="h-10 shadow-sm hover:shadow-md transition-all">
+                Atur Kriteria
+              </Button>
+            </Link>
+            <Link href="/alternatives">
+              <Button variant="outline" className="h-10 shadow-sm hover:shadow-md transition-all">
+                Data Penerima
+              </Button>
+            </Link>
+            <Link href="/calculation">
+              <Button className="h-10 shadow-lg shadow-primary/25">
+                Hitung Kelayakan
+              </Button>
+            </Link>
+          </div>
         </div>
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">BANSOS Dashboard</h1>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Sistem Penilaian Kelayakan Penerima Bantuan Sosial menggunakan metode VIKOR (VlseKriterijumska Optimizacija I Kompromisno Resenje).
-        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-3">
-        <Card className="glass-card hover:shadow-md transition-all duration-300">
+        <Card className="glass-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Kriteria Penilaian</CardTitle>
             <ListFilter className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{criteria.length}</div>
+            <div className="text-2xl font-bold tracking-tight">{criteria.length}</div>
             <p className="text-xs text-muted-foreground">
               Parameter kelayakan aktif
             </p>
           </CardContent>
         </Card>
-        <Card className="glass-card hover:shadow-md transition-all duration-300">
+        <Card className="glass-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Calon Penerima</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{alternatives.length}</div>
+            <div className="text-2xl font-bold tracking-tight">{alternatives.length}</div>
             <p className="text-xs text-muted-foreground">
               Warga terdaftar dalam sistem
             </p>
           </CardContent>
         </Card>
-        <Card className="glass-card hover:shadow-md transition-all duration-300 bg-primary/5 border-primary/20">
+        <Card className="glass-card hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 bg-primary/5 border-primary/20">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-primary">Status Sistem</CardTitle>
             <Trophy className="h-4 w-4 text-primary" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-primary">Siap</div>
+            <div className="text-2xl font-bold text-primary tracking-tight">Siap</div>
             <p className="text-xs text-primary/80">
               Data siap untuk dikalkulasi
             </p>
@@ -61,7 +81,7 @@ export default function Home() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4 glass-card">
+        <Card className="col-span-4 glass-card hover:shadow-lg transition-all">
           <CardHeader>
             <CardTitle>Tentang Metode VIKOR</CardTitle>
             <CardDescription>
@@ -72,7 +92,7 @@ export default function Home() {
             <p className="text-sm text-muted-foreground leading-relaxed">
               Sistem ini menggunakan metode VIKOR untuk meranking calon penerima bantuan sosial. Metode ini berfokus pada perankingan dan pemilihan dari sekumpulan alternatif dengan kriteria yang saling bertentangan (misalnya: Penghasilan vs Tanggungan), untuk mencapai solusi kompromi yang paling mendekati ideal.
             </p>
-            <div className="bg-secondary/50 p-4 rounded-lg border border-border space-y-2">
+            <div className="bg-secondary/50 p-4 rounded-lg border border-border space-y-2 shadow-sm">
               <h4 className="font-semibold text-sm flex items-center gap-2">
                 <FileText className="size-4" />
                 Alur Proses:
@@ -88,26 +108,26 @@ export default function Home() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3 glass-card flex flex-col">
+        <Card className="col-span-3 glass-card flex flex-col hover:shadow-lg transition-all">
           <CardHeader>
             <CardTitle>Menu Utama</CardTitle>
             <CardDescription>Akses cepat manajemen data</CardDescription>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col justify-center gap-3">
             <Link href="/criteria">
-              <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-colors">
+              <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-all hover:shadow-md">
                 <span className="flex items-center gap-2"><ListFilter className="size-4" /> Atur Kriteria</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>
             <Link href="/alternatives">
-              <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-colors">
+              <Button variant="outline" className="w-full justify-between h-12 hover:border-primary hover:text-primary transition-all hover:shadow-md">
                 <span className="flex items-center gap-2"><Users className="size-4" /> Data Penerima</span>
                 <ArrowRight className="size-4" />
               </Button>
             </Link>
             <Link href="/calculation">
-              <Button className="w-full justify-between h-12 shadow-lg shadow-primary/25">
+              <Button className="w-full justify-between h-12 shadow-lg shadow-primary/25 hover:shadow-xl transition-all">
                 <span className="flex items-center gap-2"><Calculator className="size-4" /> Hitung Kelayakan</span>
                 <ArrowRight className="size-4" />
               </Button>
