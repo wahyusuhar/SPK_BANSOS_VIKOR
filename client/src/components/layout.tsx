@@ -80,14 +80,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       {/* Mobile Sidebar */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
+      <div className="md:hidden fixed top-4 right-4 z-50">
         <Sheet open={isMobileOpen} onOpenChange={setIsMobileOpen}>
           <SheetTrigger asChild>
             <Button variant="outline" size="icon" className="shadow-md">
               <Menu className="size-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-72">
+          <SheetContent side="right" className="p-0 w-72">
             <NavContent />
           </SheetContent>
         </Sheet>

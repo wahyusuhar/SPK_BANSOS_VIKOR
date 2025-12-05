@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus, Trash2, Edit, User, MapPin, FileText } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
@@ -120,7 +121,7 @@ export default function AlternativesPage() {
           <h1 className="text-3xl font-bold tracking-tight">Data Calon Penerima</h1>
           <p className="text-muted-foreground">Kelola data warga dan input nilai kriteria</p>
         </div>
-        <Button onClick={handleAddNew} className="shadow-lg shadow-primary/20">
+        <Button onClick={handleAddNew} className="bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 mt-30">
           <Plus className="mr-2 h-4 w-4" /> Tambah Warga
         </Button>
       </div>
@@ -260,12 +261,12 @@ export default function AlternativesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {criteria.map((c) => (
                     <div key={c.id} className="space-y-2 bg-card p-3 rounded-md border border-border/50">
-                       <FormLabel className="text-xs font-medium flex justify-between">
+                       <Label className="text-xs font-medium flex justify-between">
                          {c.name}
                          <span className={`text-[10px] px-1.5 py-0.5 rounded ${c.type === 'benefit' ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'}`}>
                            {c.type}
                          </span>
-                       </FormLabel>
+                       </Label>
                        <Input 
                          type="number" 
                          step="any"

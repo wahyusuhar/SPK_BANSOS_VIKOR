@@ -113,7 +113,7 @@ export default function CriteriaPage() {
           <h1 className="text-3xl font-bold tracking-tight">Data Kriteria</h1>
           <p className="text-muted-foreground">Kelola kriteria penilaian dan bobot</p>
         </div>
-        <Button onClick={handleAddNew} className="shadow-lg shadow-primary/20">
+        <Button onClick={handleAddNew} className="bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20 mt-20">
           <Plus className="mr-2 h-4 w-4" /> Tambah Kriteria
         </Button>
       </div>
