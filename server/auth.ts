@@ -2,9 +2,8 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
-import { storage } from "./storage";
 
-// Hardcoded admin user (Penyelamat jika Database Error)
+// Hardcoded admin user for robust fallback
 const ADMIN_USER = {
   id: "admin-id",
   username: "admin",
@@ -12,22 +11,20 @@ const ADMIN_USER = {
 };
 
 export function setupAuth(app: Express) {
-  // 1. Trust Proxy (Wajib untuk Vercel)
-  app.set("trust proxy", 1);
-
-  // 2. Setup Session
+  // Use default MemoryStore by not specifying store
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "very_secret_session_secret_123",
     resave: false,
     saveUninitialized: false,
-    store: storage.sessionStore,
     cookie: {
-      // Di Vercel production gunakan secure (HTTPS), tapi di local tidak.
-      secure: process.env.NODE_ENV === "production", 
-      sameSite: "lax", // Lax lebih aman agar cookie terkirim saat navigasi
-      maxAge: 24 * 60 * 60 * 1000, // 24 jam
+      secure: app.get("env") === "production",
+      maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   };
+
+  if (app.get("env") === "production") {
+    app.set("trust proxy", 1);
+  }
 
   app.use(session(sessionSettings));
   app.use(passport.initialize());
@@ -36,25 +33,21 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        // 1. Cek Admin Hardcoded DULU
+        console.log(`Attempting login for: ${username}`);
         if (
           username === ADMIN_USER.username &&
           password === ADMIN_USER.password
         ) {
+          console.log("Admin login successful");
           return done(null, ADMIN_USER);
         }
-
-        // 2. Cek Storage
-        const user = await storage.getUserByUsername(username);
-        if (!user || user.password !== password) {
-          return done(null, false);
-        } else {
-          return done(null, user);
-        }
+        console.log("Login failed: Invalid credentials");
+        return done(null, false);
       } catch (err) {
+        console.error("Login error:", err);
         return done(err);
       }
-    }),
+    })
   );
 
   passport.serializeUser((user: any, done) => {
@@ -66,31 +59,31 @@ export function setupAuth(app: Express) {
       if (id === ADMIN_USER.id) {
         return done(null, ADMIN_USER);
       }
-      const user = await storage.getUser(id);
-      done(null, user);
+      done(null, false);
     } catch (err) {
       done(err);
     }
   });
 
-  // --- ROUTES ---
-
-  app.post("/api/register", async (req, res) => {
+  app.post("/api/register", (req, res) => {
     res.status(403).send("Registrasi dinonaktifkan. Gunakan akun admin.");
   });
 
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, info: any) => {
-      if (err) return next(err);
-      if (!user) return res.status(400).send("Invalid username or password");
-      
+      if (err) {
+        console.error("Passport auth error:", err);
+        return next(err);
+      }
+      if (!user) {
+        return res.status(400).send("Invalid username or password");
+      }
       req.login(user, (err) => {
-        if (err) return next(err);
-        return res.status(200).json({ 
-            id: user.id, 
-            username: user.username, 
-            role: user.role || 'admin' 
-        });
+        if (err) {
+          console.error("Req login error:", err);
+          return next(err);
+        }
+        return res.status(200).json(user);
       });
     })(req, res, next);
   });
@@ -107,9 +100,7 @@ export function setupAuth(app: Express) {
     res.json(req.user);
   });
 
-  app.get("/api/registration-status", async (req, res) => {
-    // Karena kita pakai memory storage, anggap saja tidak bisa register
-    // agar user dipaksa login pakai admin
+  app.get("/api/registration-status", (req, res) => {
     res.json({ canRegister: false });
   });
 }
