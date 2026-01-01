@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
+import { storage } from "./storage";
 
 // Hardcoded admin user for robust fallback
 const ADMIN_USER = {
@@ -11,16 +12,22 @@ const ADMIN_USER = {
 };
 
 export function setupAuth(app: Express) {
+  // 1. PENTING UNTUK VERCEL: Trust Proxy harus di-set sebelum session
+  // Vercel menggunakan proxy, jadi Express perlu mempercayai header X-Forwarded-Proto
+  app.set("trust proxy", 1);
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "very_secret_session_secret_123",
     resave: false,
     saveUninitialized: false,
-    store: new session.MemoryStore(),
+    store: storage.sessionStore,
+    // 2. Konfigurasi Cookie untuk Production/Vercel
+    cookie: {
+      secure: process.env.NODE_ENV === "production", // Wajib true jika di HTTPS (Vercel default HTTPS)
+      sameSite: "lax", // Disarankan 'lax' atau 'none'
+      maxAge: 24 * 60 * 60 * 1000, // 24 jam
+    },
   };
-
-  if (app.get("env") === "production") {
-    app.set("trust proxy", 1);
-  }
 
   app.use(session(sessionSettings));
   app.use(passport.initialize());
@@ -29,18 +36,25 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
-        // Direct check against hardcoded admin
+        // Direct check against hardcoded admin first
         if (
           username === ADMIN_USER.username &&
           password === ADMIN_USER.password
         ) {
           return done(null, ADMIN_USER);
         }
-        return done(null, false);
+
+        // Fallback to storage if needed
+        const user = await storage.getUserByUsername(username);
+        if (!user || user.password !== password) {
+          return done(null, false);
+        } else {
+          return done(null, user);
+        }
       } catch (err) {
         return done(err);
       }
-    })
+    }),
   );
 
   passport.serializeUser((user: any, done) => {
@@ -52,7 +66,8 @@ export function setupAuth(app: Express) {
       if (id === ADMIN_USER.id) {
         return done(null, ADMIN_USER);
       }
-      done(null, false);
+      const user = await storage.getUser(id);
+      done(null, user);
     } catch (err) {
       done(err);
     }
@@ -68,7 +83,7 @@ export function setupAuth(app: Express) {
       if (!user) return res.status(400).send("Invalid username or password");
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(200).json(user);
+        return res.status(200).json(user);
       });
     })(req, res, next);
   });
@@ -86,7 +101,13 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/registration-status", async (req, res) => {
-    // Hardcoded response since storage is removed
-    res.json({ canRegister: false });
+    // Pastikan storage.getUserCount() tidak error jika belum ada db
+    try {
+      const count = await storage.getUserCount();
+      res.json({ canRegister: count === 0 });
+    } catch (error) {
+       // Fallback jika storage error
+      res.json({ canRegister: false });
+    }
   });
 }
