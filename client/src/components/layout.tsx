@@ -7,11 +7,13 @@ import {
   Calculator,
   Menu,
   HandHeart,
+  LogOut,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import { useAuth } from "@/hooks/use-auth";
 
 const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +26,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [theme, setTheme] = useState<"light" | "dark">("light");
+  const { user, logoutMutation } = useAuth();
 
   const applyTheme = (next: "light" | "dark") => {
     setTheme(next);
@@ -85,6 +88,30 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </nav>
 
       <div className="p-6 border-t border-border/50">
+        {user && (
+          <div className="mb-4 flex items-center justify-between gap-2 p-3 rounded-lg bg-secondary/50 border border-border/50">
+            <div className="flex items-center gap-3 overflow-hidden">
+              <div className="size-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                <span className="font-bold text-primary text-xs">
+                  {user.username.charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1 overflow-hidden">
+                <p className="text-sm font-medium truncate">{user.username}</p>
+              </div>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+              onClick={() => logoutMutation.mutate()}
+              title="Keluar"
+            >
+              <LogOut className="size-4" />
+            </Button>
+          </div>
+        )}
+
         <div className="bg-card border border-border p-4 rounded-xl">
           <p className="text-xs text-muted-foreground mb-2">Status Server</p>
           <div className="flex items-center gap-2">
