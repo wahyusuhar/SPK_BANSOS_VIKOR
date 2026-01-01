@@ -1,4 +1,4 @@
-import { randomUUID, scryptSync, randomBytes } from "crypto";
+import { randomUUID } from "crypto";
 import session from "express-session";
 
 export interface User {
@@ -20,12 +20,6 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
-function hashPasswordSync(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const buf = scryptSync(password, salt, 64) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
-}
-
 export class MemStorage implements IStorage {
   private users: Map<string, User>;
   sessionStore: session.Store;
@@ -37,9 +31,8 @@ export class MemStorage implements IStorage {
   }
 
   private initializeDefaultUser() {
-    const password = hashPasswordSync("admin");
-    const id = randomUUID();
-    const user: User = { id, username: "admin", password };
+    const id = "admin-id";
+    const user: User = { id, username: "admin", password: "admin" };
     this.users.set(id, user);
     console.log("Default admin user initialized");
   }
@@ -60,8 +53,7 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const password = hashPasswordSync(insertUser.password);
-    const user: User = { ...insertUser, password, id };
+    const user: User = { ...insertUser, id };
     this.users.set(id, user);
     return user;
   }

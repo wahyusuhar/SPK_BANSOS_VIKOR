@@ -8,6 +8,11 @@ const httpServer = createServer(app);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Health check to verify API is running
+app.get("/api/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 // Setup routes
 registerRoutes(httpServer, app);
 
