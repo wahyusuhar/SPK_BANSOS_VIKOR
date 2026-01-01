@@ -34,7 +34,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Plus, Trash2, Edit, ArrowUpDown } from "lucide-react";
+import { Plus, Trash2, Edit, ArrowUpDown, AlertCircle } from "lucide-react";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -137,6 +137,9 @@ export default function CriteriaPage() {
     setIsDialogOpen(true);
   };
 
+  const totalWeight = criteria.reduce((a, b) => a + b.weight, 0);
+  const isWeightValid = Math.abs(totalWeight - 1.0) < 0.001;
+
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
@@ -197,12 +200,12 @@ export default function CriteriaPage() {
                       {item.type.toUpperCase()}
                     </span>
                   </TableCell>
-                  
+
                   {/* PERBAIKAN DI SINI: Menggunakan .toFixed(2) */}
                   <TableCell className="font-mono">
                     {item.weight.toFixed(2)}
                   </TableCell>
-                  
+
                   <TableCell className="text-muted-foreground text-sm">
                     {item.description}
                   </TableCell>
@@ -258,7 +261,10 @@ export default function CriteriaPage() {
                   <FormItem>
                     <FormLabel>Nama Kriteria</FormLabel>
                     <FormControl>
-                      <Input placeholder="Contoh: Jumlah Tanggungan" {...field} />
+                      <Input
+                        placeholder="Contoh: Jumlah Tanggungan"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
