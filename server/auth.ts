@@ -101,6 +101,37 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
+    passport.authenticate("local", (err: any, user: User, info: any) => {
+      if (err) {
+        return next(err);
+      }
+      if (!user) {
+        return res.status(401).json({ message: "Invalid username or password" });
+      }
+      req.login(user, (err) => {
+        if (err) {
+          return next(err);
+        }
+        return res.status(200).json(user);
+      });
+    })(req, res, next);
+  });
+
+  app.post("/api/logout", (req, res, next) => {
+    req.logout((err) => {
+      if (err) return next(err);
+      res.sendStatus(200);
+    });
+  });
+
+  app.get("/api/user", (req, res) => {
+    if (!req.isAuthenticated()) return res.sendStatus(401);
+    res.json(req.user);
+  });
+}
+  });
+
+  app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) return next(err);
       if (!user) return res.status(401).send("Invalid credentials");
