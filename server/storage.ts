@@ -1,15 +1,14 @@
 import { randomUUID } from "crypto";
 import session from "express-session";
-import createMemoryStore from "memorystore";
 
-const MemoryStore = createMemoryStore(session);
+// HAPUS import memorystore agar tidak error jika package.json belum terupdate
+// import createMemoryStore from "memorystore"; 
 
 export interface User {
   id: string;
   username: string;
   password: string;
-  // Menambahkan field role opsional agar kompatibel jika dikembangkan
-  role?: string; 
+  role?: string;
 }
 
 export interface InsertUser {
@@ -32,17 +31,15 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     
-    // PERBAIKAN: Menggunakan 'memorystore' yang production-ready
-    // agar session tidak bocor (memory leak) dan lebih stabil di Vercel.
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000 // Prune expired entries every 24h
-    });
+    // KITA GUNAKAN BAWAAN (DEFAULT) AGAR PASTI JALAN
+    // Ini aman untuk Vercel (karena serverless sering restart anyway)
+    // dan menjamin tidak ada error "Module missing".
+    this.sessionStore = new session.MemoryStore();
 
     this.initializeDefaultUser();
   }
 
   private initializeDefaultUser() {
-    // Pastikan user admin selalu ada setiap kali server Vercel restart/wake up
     const id = "admin-id";
     const user: User = { 
       id, 
@@ -51,7 +48,7 @@ export class MemStorage implements IStorage {
       role: "admin"
     };
     this.users.set(id, user);
-    console.log("[Storage] Default admin user initialized in memory");
+    console.log("[Storage] Default admin user initialized");
   }
 
   async getUser(id: string): Promise<User | undefined> {
