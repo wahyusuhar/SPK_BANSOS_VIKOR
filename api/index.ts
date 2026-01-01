@@ -9,9 +9,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Setup routes
-(async () => {
-  await registerRoutes(httpServer, app);
-})();
+registerRoutes(httpServer, app);
 
 // Error handling
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
