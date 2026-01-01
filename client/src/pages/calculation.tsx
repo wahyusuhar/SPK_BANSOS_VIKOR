@@ -158,9 +158,10 @@ export default function CalculationPage() {
           </Card>
 
           <Tabs defaultValue="ranking" className="w-full">
-            <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsList className="grid w-full max-w-2xl grid-cols-3">
               <TabsTrigger value="ranking">Ranking & Visualisasi</TabsTrigger>
               <TabsTrigger value="details">Matriks & Data Teknis</TabsTrigger>
+              <TabsTrigger value="explanation">Penjelasan Sistem</TabsTrigger>
             </TabsList>
 
             <TabsContent value="ranking" className="space-y-6 mt-6">
@@ -438,6 +439,127 @@ export default function CalculationPage() {
                         ))}
                       </TableBody>
                     </Table>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="explanation" className="space-y-6 mt-6">
+              <Card className="glass-card">
+                <CardHeader>
+                  <CardTitle>Panduan & Penjelasan Sistem VIKOR</CardTitle>
+                  <CardDescription>
+                    Pemahaman mendalam tentang logika perhitungan sistem
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-8">
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <span className="flex items-center justify-center size-6 rounded-full bg-primary/10 text-primary text-xs">
+                        1
+                      </span>
+                      Mengapa Total Bobot Harus 1.0 (100%)?
+                    </h3>
+                    <div className="pl-8 text-sm text-muted-foreground space-y-2 leading-relaxed">
+                      <p>
+                        Dalam matematika pengambilan keputusan (MCDM), bobot
+                        melambangkan <strong>proporsi kepentingan</strong> yang
+                        jika dijumlahkan harus membentuk satu kesatuan utuh
+                        (100%).
+                      </p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>
+                          Jika total bobot &lt; 1.0, berarti ada faktor penentu
+                          keputusan yang "hilang".
+                        </li>
+                        <li>
+                          Jika total bobot &gt; 1.0, berarti ada bias berlebih
+                          dalam penilaian.
+                        </li>
+                      </ul>
+                      <div className="bg-secondary/50 p-4 rounded-lg border border-border mt-2">
+                        <p className="font-medium text-foreground mb-1">
+                          Ilustrasi "Pembagian Kue":
+                        </p>
+                        <p>
+                          Ekonomi (0.5) + Kesehatan (0.3) + Pendidikan (0.2) ={" "}
+                          <strong>1.0 (100% Utuh)</strong>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <span className="flex items-center justify-center size-6 rounded-full bg-primary/10 text-primary text-xs">
+                        2
+                      </span>
+                      Tahapan & Matriks Perhitungan
+                    </h3>
+                    <div className="pl-8 text-sm text-muted-foreground space-y-4 leading-relaxed">
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <div className="p-4 rounded-lg border bg-card/50">
+                          <strong className="text-foreground block mb-1">
+                            1. Matriks Normalisasi
+                          </strong>
+                          Mengubah satuan data yang berbeda (Rupiah, Orang,
+                          Skor) menjadi skala seragam (0-1) agar bisa
+                          dibandingkan secara adil.
+                        </div>
+                        <div className="p-4 rounded-lg border bg-card/50">
+                          <strong className="text-foreground block mb-1">
+                            2. Nilai S (Utility)
+                          </strong>
+                          Mengukur "rata-rata kepuasan". Semakin kecil nilai S,
+                          semakin mayoritas kriteria terpenuhi dengan baik oleh
+                          warga tersebut.
+                        </div>
+                        <div className="p-4 rounded-lg border bg-card/50">
+                          <strong className="text-foreground block mb-1">
+                            3. Nilai R (Regret)
+                          </strong>
+                          Mengukur "penyesalan maksimal". Mencari apakah warga
+                          tersebut memiliki kelemahan fatal di salah satu
+                          kriteria tertentu.
+                        </div>
+                        <div className="p-4 rounded-lg border bg-card/50">
+                          <strong className="text-foreground block mb-1">
+                            4. Nilai Q (Index VIKOR)
+                          </strong>
+                          Gabungan kompromi antara S dan R. Ranking 1 adalah
+                          warga dengan nilai Q terkecil (mendekati 0).
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold flex items-center gap-2">
+                      <span className="flex items-center justify-center size-6 rounded-full bg-primary/10 text-primary text-xs">
+                        3
+                      </span>
+                      Cara Membaca Hasil Akhir
+                    </h3>
+                    <div className="pl-8 text-sm text-muted-foreground space-y-2 leading-relaxed">
+                      <p>
+                        Pada tabel <strong>"Hasil Perankingan Akhir"</strong>:
+                      </p>
+                      <ul className="list-disc list-inside space-y-1">
+                        <li>
+                          <strong>Ranking 1</strong> adalah penerima bantuan
+                          yang paling direkomendasikan.
+                        </li>
+                        <li>
+                          <strong>Nilai Q</strong>: Semakin{" "}
+                          <strong>KECIL</strong> (mendekati 0), semakin{" "}
+                          <strong>BAIK</strong>.
+                        </li>
+                        <li>
+                          Q = 0.00 artinya kandidat tersebut adalah yang terbaik
+                          mutlak berdasarkan data yang ada.
+                        </li>
+                      </ul>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
