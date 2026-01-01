@@ -1,6 +1,15 @@
 import { type User, type InsertUser } from "../shared/schema";
-import { randomUUID } from "crypto";
+import { randomUUID, scrypt, randomBytes } from "crypto";
+import { promisify } from "util";
 import session from "express-session";
+
+const scryptAsync = promisify(scrypt);
+
+async function hashPassword(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
+}
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -17,6 +26,14 @@ export class MemStorage implements IStorage {
   constructor() {
     this.users = new Map();
     this.sessionStore = new session.MemoryStore();
+    this.initializeDefaultUser();
+  }
+
+  private async initializeDefaultUser() {
+    const password = await hashPassword("admin");
+    const id = randomUUID();
+    const user: User = { id, username: "admin", password };
+    this.users.set(id, user);
   }
 
   async getUser(id: string): Promise<User | undefined> {

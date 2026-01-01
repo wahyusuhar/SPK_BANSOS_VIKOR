@@ -76,59 +76,33 @@ export default function AuthPage() {
           </div>
 
           <div className="bg-card/50 backdrop-blur-xl border border-border/50 rounded-3xl p-6 shadow-2xl shadow-slate-200/50 dark:shadow-none">
-            {canRegister ? (
-              <Tabs defaultValue="login" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6 h-12 p-1 bg-muted/50 rounded-xl">
-                  <TabsTrigger
-                    value="login"
-                    className="rounded-lg font-medium transition-all"
-                  >
-                    Masuk
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="register"
-                    className="rounded-lg font-medium transition-all"
-                  >
-                    Daftar
-                  </TabsTrigger>
-                </TabsList>
-
-                <TabsContent
+            <Tabs defaultValue="login" className="w-full">
+              <TabsList className="grid w-full grid-cols-1 mb-6 h-12 p-1 bg-muted/50 rounded-xl">
+                <TabsTrigger
                   value="login"
-                  className="mt-0 focus-visible:ring-0 focus-visible:outline-none"
+                  className="rounded-lg font-medium transition-all"
                 >
-                  <LoginForm
-                    onSubmit={(data) => loginMutation.mutate(data)}
-                    isLoading={loginMutation.isPending}
-                  />
-                </TabsContent>
+                  Masuk
+                </TabsTrigger>
+              </TabsList>
 
-                <TabsContent
-                  value="register"
-                  className="mt-0 focus-visible:ring-0 focus-visible:outline-none"
-                >
-                  <RegisterForm
-                    onSubmit={(data) => registerMutation.mutate(data)}
-                    isLoading={registerMutation.isPending}
-                  />
-                </TabsContent>
-              </Tabs>
-            ) : (
-              <div className="space-y-6">
-                <div className="text-center space-y-1 pb-2">
-                  <h3 className="text-lg font-semibold text-foreground">
-                    Selamat Datang Kembali
-                  </h3>
-                  <p className="text-xs text-muted-foreground">
-                    Masuk ke dashboard admin
-                  </p>
-                </div>
+              <TabsContent
+                value="login"
+                className="mt-0 focus-visible:ring-0 focus-visible:outline-none"
+              >
                 <LoginForm
                   onSubmit={(data) => loginMutation.mutate(data)}
                   isLoading={loginMutation.isPending}
                 />
-              </div>
-            )}
+                <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-800">
+                  <p className="text-xs text-center text-blue-600 dark:text-blue-300 font-medium">
+                    Default Login: <br />
+                    Username: <span className="font-bold">admin</span> |
+                    Password: <span className="font-bold">admin</span>
+                  </p>
+                </div>
+              </TabsContent>
+            </Tabs>
           </div>
 
           <div className="text-center">
