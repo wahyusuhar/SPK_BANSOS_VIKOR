@@ -157,6 +157,24 @@ export default function CriteriaPage() {
         </Button>
       </div>
 
+      {!isWeightValid && (
+        <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2 border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200">
+          <AlertCircle className="h-5 w-5" />
+          <AlertTitle className="text-lg font-bold">Perhatian: Total Bobot Tidak Valid!</AlertTitle>
+          <AlertDescription className="mt-2 text-base">
+            Total bobot saat ini adalah <strong className="text-xl underline">{totalWeight.toFixed(2)}</strong>. 
+            <br />
+            Wajib bernilai tepat <strong>1.00</strong> agar hasil perhitungan akurat. 
+            <br />
+            <span className="text-sm opacity-90 mt-1 block">
+              {totalWeight < 1.0 
+                ? `(Kurang ${ (1.0 - totalWeight).toFixed(2) } lagi)` 
+                : `(Kelebihan ${ (totalWeight - 1.0).toFixed(2) })`}
+            </span>
+          </AlertDescription>
+        </Alert>
+      )}
+
       <Card className="glass-card">
         <CardHeader>
           <CardTitle>Daftar Kriteria</CardTitle>
@@ -169,7 +187,7 @@ export default function CriteriaPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="w-[80px]">ID</TableHead>
+                <TableHead className="w-20">ID</TableHead>
                 <TableHead>Nama Kriteria</TableHead>
                 <TableHead>Tipe</TableHead>
                 <TableHead>Bobot</TableHead>
