@@ -1,23 +1,32 @@
-import passport from "passport";
-import { Strategy as LocalStrategy } from "passport-local";
-import { Express } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
 
-// Hardcoded admin user for robust fallback
+// Hardcoded admin user
 const ADMIN_USER = {
   id: "admin-id",
   username: "admin",
   password: "admin",
 };
 
+// Extend express-session to include user
+declare module "express-session" {
+  interface SessionData {
+    user: typeof ADMIN_USER;
+  }
+}
+
 export function setupAuth(app: Express) {
-  // Use default MemoryStore by not specifying store
+  // Simple memory store for sessions
+  // In Vercel serverless, this will reset on every function restart (cold start)
+  // but it should work for a single session during a warm period.
+  // For persistent sessions in production, we'd need Redis/Postgres store.
+  // But for this demo/fix, we accept ephemeral sessions.
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "very_secret_session_secret_123",
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: app.get("env") === "production",
+      secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     },
   };
@@ -27,80 +36,57 @@ export function setupAuth(app: Express) {
   }
 
   app.use(session(sessionSettings));
-  app.use(passport.initialize());
-  app.use(passport.session());
 
-  passport.use(
-    new LocalStrategy(async (username, password, done) => {
-      try {
-        console.log(`Attempting login for: ${username}`);
-        if (
-          username === ADMIN_USER.username &&
-          password === ADMIN_USER.password
-        ) {
-          console.log("Admin login successful");
-          return done(null, ADMIN_USER);
-        }
-        console.log("Login failed: Invalid credentials");
-        return done(null, false);
-      } catch (err) {
-        console.error("Login error:", err);
-        return done(err);
-      }
-    })
-  );
-
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+  // Middleware to simulate req.user from passport
+  app.use((req: any, res: Response, next: NextFunction) => {
+    if (req.session && req.session.user) {
+      req.user = req.session.user;
+      req.isAuthenticated = () => true;
+    } else {
+      req.user = undefined;
+      req.isAuthenticated = () => false;
+    }
+    next();
   });
 
-  passport.deserializeUser(async (id: string, done) => {
-    try {
-      if (id === ADMIN_USER.id) {
-        return done(null, ADMIN_USER);
-      }
-      done(null, false);
-    } catch (err) {
-      done(err);
+  app.post("/api/login", (req, res) => {
+    const { username, password } = req.body;
+
+    console.log(`Login attempt: ${username}`);
+
+    if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
+      req.session.user = ADMIN_USER;
+      req.session.save((err) => {
+        if (err) {
+          console.error("Session save error:", err);
+          return res.status(500).send("Session error");
+        }
+        console.log("Login success");
+        return res.status(200).json(ADMIN_USER);
+      });
+    } else {
+      console.log("Login failed");
+      return res.status(401).send("Invalid username or password");
     }
   });
 
-  app.post("/api/register", (req, res) => {
-    res.status(403).send("Registrasi dinonaktifkan. Gunakan akun admin.");
-  });
-
-  app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err: any, user: any, info: any) => {
-      if (err) {
-        console.error("Passport auth error:", err);
-        return next(err);
-      }
-      if (!user) {
-        return res.status(400).send("Invalid username or password");
-      }
-      req.login(user, (err) => {
-        if (err) {
-          console.error("Req login error:", err);
-          return next(err);
-        }
-        return res.status(200).json(user);
-      });
-    })(req, res, next);
-  });
-
-  app.post("/api/logout", (req, res, next) => {
-    req.logout((err) => {
-      if (err) return next(err);
+  app.post("/api/logout", (req, res) => {
+    req.session.destroy((err) => {
+      if (err) return res.status(500).send("Logout failed");
       res.sendStatus(200);
     });
   });
 
-  app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+  app.get("/api/user", (req: any, res) => {
+    if (!req.user) return res.sendStatus(401);
     res.json(req.user);
   });
 
   app.get("/api/registration-status", (req, res) => {
     res.json({ canRegister: false });
+  });
+
+  app.post("/api/register", (req, res) => {
+    res.status(403).send("Registrasi dinonaktifkan.");
   });
 }
