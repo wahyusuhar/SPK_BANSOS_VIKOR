@@ -5,6 +5,8 @@ import { createServer } from "http";
 const app = express();
 const httpServer = createServer(app);
 
+console.log("[API] Initializing...");
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
