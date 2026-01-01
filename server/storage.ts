@@ -1,9 +1,6 @@
 import { randomUUID } from "crypto";
 import session from "express-session";
 
-// HAPUS import memorystore agar tidak error jika package.json belum terupdate
-// import createMemoryStore from "memorystore"; 
-
 export interface User {
   id: string;
   username: string;
@@ -30,25 +27,24 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
-    
-    // KITA GUNAKAN BAWAAN (DEFAULT) AGAR PASTI JALAN
-    // Ini aman untuk Vercel (karena serverless sering restart anyway)
-    // dan menjamin tidak ada error "Module missing".
     this.sessionStore = new session.MemoryStore();
-
     this.initializeDefaultUser();
   }
 
   private initializeDefaultUser() {
-    const id = "admin-id";
-    const user: User = { 
-      id, 
-      username: "admin", 
-      password: "admin",
-      role: "admin"
-    };
-    this.users.set(id, user);
-    console.log("[Storage] Default admin user initialized");
+    try {
+      const id = "admin-id";
+      const user: User = { 
+        id, 
+        username: "admin", 
+        password: "admin",
+        role: "admin"
+      };
+      this.users.set(id, user);
+      console.log("[Storage] Default admin user initialized");
+    } catch (error) {
+      console.error("[Storage] Failed to initialize default user:", error);
+    }
   }
 
   async getUser(id: string): Promise<User | undefined> {

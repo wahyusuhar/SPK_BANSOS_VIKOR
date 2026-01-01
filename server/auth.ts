@@ -1,30 +1,21 @@
 import { Express, Request, Response, NextFunction } from "express";
 import session from "express-session";
-
-// Hardcoded admin user
-const ADMIN_USER = {
-  id: "admin-id",
-  username: "admin",
-  password: "admin",
-};
+import { storage, User } from "./storage";
 
 // Extend express-session to include user
 declare module "express-session" {
   interface SessionData {
-    user: typeof ADMIN_USER;
+    user: User;
   }
 }
 
 export function setupAuth(app: Express) {
   // Simple memory store for sessions
-  // In Vercel serverless, this will reset on every function restart (cold start)
-  // but it should work for a single session during a warm period.
-  // For persistent sessions in production, we'd need Redis/Postgres store.
-  // But for this demo/fix, we accept ephemeral sessions.
   const sessionSettings: session.SessionOptions = {
     secret: process.env.SESSION_SECRET || "very_secret_session_secret_123",
     resave: false,
     saveUninitialized: false,
+    store: storage.sessionStore,
     cookie: {
       secure: process.env.NODE_ENV === "production",
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
@@ -49,24 +40,31 @@ export function setupAuth(app: Express) {
     next();
   });
 
-  app.post("/api/login", (req, res) => {
-    const { username, password } = req.body;
+  app.post("/api/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
 
-    console.log(`Login attempt: ${username}`);
+      console.log(`[Auth] Login attempt: ${username}`);
 
-    if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
-      req.session.user = ADMIN_USER;
-      req.session.save((err) => {
-        if (err) {
-          console.error("Session save error:", err);
-          return res.status(500).send("Session error");
-        }
-        console.log("Login success");
-        return res.status(200).json(ADMIN_USER);
-      });
-    } else {
-      console.log("Login failed");
-      return res.status(401).send("Invalid username or password");
+      const user = await storage.getUserByUsername(username);
+
+      if (user && user.password === password) {
+        req.session.user = user;
+        req.session.save((err) => {
+          if (err) {
+            console.error("[Auth] Session save error:", err);
+            return res.status(500).send("Session error");
+          }
+          console.log("[Auth] Login success");
+          return res.status(200).json(user);
+        });
+      } else {
+        console.log("[Auth] Login failed: Invalid credentials");
+        return res.status(401).send("Invalid username or password");
+      }
+    } catch (error) {
+      console.error("[Auth] Login error:", error);
+      res.status(500).send("Internal Server Error during login");
     }
   });
 
@@ -82,8 +80,14 @@ export function setupAuth(app: Express) {
     res.json(req.user);
   });
 
-  app.get("/api/registration-status", (req, res) => {
-    res.json({ canRegister: false });
+  app.get("/api/registration-status", async (req, res) => {
+    try {
+      const count = await storage.getUserCount();
+      res.json({ canRegister: count === 0 });
+    } catch (error) {
+      console.error("[Auth] Registration status error:", error);
+      res.status(500).json({ message: "Error checking status" });
+    }
   });
 
   app.post("/api/register", (req, res) => {
