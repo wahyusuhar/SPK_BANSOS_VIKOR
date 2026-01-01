@@ -93,7 +93,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
-        canRegister: registrationStatus?.canRegister ?? false,
+        // Default to true to ensure registration is accessible on fresh/empty state
+        // Backend still validates this, so it is safe.
+        canRegister: registrationStatus?.canRegister ?? true,
       }}
     >
       {children}
