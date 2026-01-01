@@ -17,7 +17,6 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Form,
@@ -198,7 +197,12 @@ export default function CriteriaPage() {
                       {item.type.toUpperCase()}
                     </span>
                   </TableCell>
-                  <TableCell className="font-mono">{item.weight}</TableCell>
+                  
+                  {/* PERBAIKAN DI SINI: Menggunakan .toFixed(2) */}
+                  <TableCell className="font-mono">
+                    {item.weight.toFixed(2)}
+                  </TableCell>
+                  
                   <TableCell className="text-muted-foreground text-sm">
                     {item.description}
                   </TableCell>
@@ -268,10 +272,11 @@ export default function CriteriaPage() {
                     <FormItem>
                       <FormLabel>Bobot (0-1)</FormLabel>
                       <FormControl>
+                        {/* Menambahkan step 0.01 agar input desimal lebih mudah */}
                         <Input
                           type="number"
                           step="0.01"
-                          placeholder="0.1"
+                          placeholder="0.10"
                           {...field}
                         />
                       </FormControl>
