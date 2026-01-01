@@ -278,16 +278,25 @@ export default function CalculationPage() {
                           cursor={{ fill: "hsl(var(--muted)/0.2)" }}
                         />
                         <Bar dataKey="Q" radius={[0, 4, 4, 0]} barSize={20}>
-                          {chartData?.map((entry, index) => (
-                            <Cell
-                              key={`cell-${index}`}
-                              fill={
-                                index === 0
-                                  ? "hsl(var(--primary))"
-                                  : "hsl(var(--muted-foreground)/0.3)"
-                              }
-                            />
-                          ))}
+                          {chartData?.map((entry, index) => {
+                            // Warna dinamis berdasarkan urutan ranking
+                            const colors = [
+                              "#10b981", // Emerald (Juara 1)
+                              "#3b82f6", // Blue (Juara 2)
+                              "#f59e0b", // Amber (Juara 3)
+                              "#ef4444", // Red
+                              "#8b5cf6", // Violet
+                              "#ec4899", // Pink
+                              "#6366f1", // Indigo
+                              "#14b8a6", // Teal
+                            ];
+                            return (
+                              <Cell
+                                key={`cell-${index}`}
+                                fill={colors[index % colors.length]}
+                              />
+                            );
+                          })}
                         </Bar>
                       </BarChart>
                     </ResponsiveContainer>
