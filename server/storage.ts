@@ -1,14 +1,15 @@
-import { type User, type InsertUser } from "../shared/schema";
-import { randomUUID, scrypt, randomBytes } from "crypto";
-import { promisify } from "util";
+import { randomUUID, scryptSync, randomBytes } from "crypto";
 import session from "express-session";
 
-const scryptAsync = promisify(scrypt);
+export interface User {
+  id: string;
+  username: string;
+  password: string;
+}
 
-async function hashPassword(password: string) {
-  const salt = randomBytes(16).toString("hex");
-  const buf = (await scryptAsync(password, salt, 64)) as Buffer;
-  return `${buf.toString("hex")}.${salt}`;
+export interface InsertUser {
+  username: string;
+  password: string;
 }
 
 export interface IStorage {
@@ -17,6 +18,12 @@ export interface IStorage {
   createUser(user: InsertUser): Promise<User>;
   getUserCount(): Promise<number>;
   sessionStore: session.Store;
+}
+
+function hashPasswordSync(password: string) {
+  const salt = randomBytes(16).toString("hex");
+  const buf = scryptSync(password, salt, 64) as Buffer;
+  return `${buf.toString("hex")}.${salt}`;
 }
 
 export class MemStorage implements IStorage {
@@ -29,11 +36,12 @@ export class MemStorage implements IStorage {
     this.initializeDefaultUser();
   }
 
-  private async initializeDefaultUser() {
-    const password = await hashPassword("admin");
+  private initializeDefaultUser() {
+    const password = hashPasswordSync("admin");
     const id = randomUUID();
     const user: User = { id, username: "admin", password };
     this.users.set(id, user);
+    console.log("Default admin user initialized");
   }
 
   async getUser(id: string): Promise<User | undefined> {
@@ -52,7 +60,8 @@ export class MemStorage implements IStorage {
 
   async createUser(insertUser: InsertUser): Promise<User> {
     const id = randomUUID();
-    const user: User = { ...insertUser, id };
+    const password = hashPasswordSync(insertUser.password);
+    const user: User = { ...insertUser, password, id };
     this.users.set(id, user);
     return user;
   }
