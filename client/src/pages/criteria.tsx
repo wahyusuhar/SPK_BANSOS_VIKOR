@@ -52,6 +52,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 
 const criterionSchema = z.object({
@@ -158,18 +159,28 @@ export default function CriteriaPage() {
       </div>
 
       {!isWeightValid && (
-        <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-2 border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200">
+        <Alert
+          variant="destructive"
+          className="animate-in fade-in slide-in-from-top-2 border-red-500/50 bg-red-500/10 text-red-900 dark:text-red-200"
+        >
           <AlertCircle className="h-5 w-5" />
-          <AlertTitle className="text-lg font-bold">Perhatian: Total Bobot Tidak Valid!</AlertTitle>
+          <AlertTitle className="text-lg font-bold">
+            Perhatian: Total Bobot Tidak Valid!
+          </AlertTitle>
           <AlertDescription className="mt-2 text-base">
-            Total bobot saat ini adalah <strong className="text-xl underline">{totalWeight.toFixed(2)}</strong>. 
+            Total bobot saat ini adalah{" "}
+            <strong className="text-xl underline">
+              {totalWeight.toFixed(2)}
+            </strong>
+            .
             <br />
-            Wajib bernilai tepat <strong>1.00</strong> agar hasil perhitungan akurat. 
+            Wajib bernilai tepat <strong>1.00</strong> agar hasil perhitungan
+            akurat.
             <br />
             <span className="text-sm opacity-90 mt-1 block">
-              {totalWeight < 1.0 
-                ? `(Kurang ${ (1.0 - totalWeight).toFixed(2) } lagi)` 
-                : `(Kelebihan ${ (totalWeight - 1.0).toFixed(2) })`}
+              {totalWeight < 1.0
+                ? `(Kurang ${(1.0 - totalWeight).toFixed(2)} lagi)`
+                : `(Kelebihan ${(totalWeight - 1.0).toFixed(2)})`}
             </span>
           </AlertDescription>
         </Alert>
@@ -180,7 +191,16 @@ export default function CriteriaPage() {
           <CardTitle>Daftar Kriteria</CardTitle>
           <CardDescription>
             Pastikan total bobot disarankan mendekati 1.0 (Saat ini:{" "}
-            {criteria.reduce((a, b) => a + b.weight, 0).toFixed(2)})
+            <span
+              className={
+                isWeightValid
+                  ? "text-emerald-600 font-bold"
+                  : "text-red-600 font-bold"
+              }
+            >
+              {totalWeight.toFixed(2)}
+            </span>
+            )
           </CardDescription>
         </CardHeader>
         <CardContent>
