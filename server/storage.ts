@@ -1,9 +1,6 @@
-import { type User, type InsertUser } from "@shared/schema";
+import { type User, type InsertUser } from "../shared/schema";
 import { randomUUID } from "crypto";
 import session from "express-session";
-import createMemoryStore from "memorystore";
-
-const MemoryStore = createMemoryStore(session);
 
 export interface IStorage {
   getUser(id: string): Promise<User | undefined>;
@@ -19,9 +16,7 @@ export class MemStorage implements IStorage {
 
   constructor() {
     this.users = new Map();
-    this.sessionStore = new MemoryStore({
-      checkPeriod: 86400000,
-    });
+    this.sessionStore = new session.MemoryStore();
   }
 
   async getUser(id: string): Promise<User | undefined> {
